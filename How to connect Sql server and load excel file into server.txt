@@ -1,0 +1,43 @@
+pip install pyodbc
+
+
+!pip install sqlalchemy
+
+import pyodbc
+
+conn = pyodbc.connect(
+    "DRIVER={SQL Server};"
+    "SERVER=LPO18332;"
+    "DATABASE=Shiv;"
+    "Trusted_Connection=yes;"
+)
+
+cursor = conn.cursor()
+cursor.execute("SELECT @@VERSION")
+print(cursor.fetchone())
+
+
+
+import pandas as pd
+import pyodbc
+from sqlalchemy import create_engine
+
+# Database connection details
+server = 'LPO18332'
+database = 'Shiv'
+table_name = 'Ssst'  # Change this to your actual table name
+
+# Path to the Excel file
+file_path = r"C:\Exam_Data\Ana\Ssst.xlsx"
+
+# Read Excel file into Pandas DataFrame, skipping the first 4 rows
+df = pd.read_excel(file_path, skiprows=4)  # Skips first 4 rows (0-based index)
+
+# Create a SQLAlchemy engine
+engine = create_engine(f'mssql+pyodbc://@{server}/{database}?trusted_connection=yes&driver=ODBC+Driver+17+for+SQL+Server')
+
+# Insert data into SQL Server (append to avoid overwriting)
+df.to_sql(table_name, con=engine, if_exists='append', index=False)
+
+print("Data successfully imported into SQL Server from row 5 onwards.")
+
